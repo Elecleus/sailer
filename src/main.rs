@@ -1,13 +1,14 @@
 use clap::{Parser, Subcommand};
-use std::{fs, path::Path};
+use std::path::PathBuf;
+
+mod add;
+mod init;
+mod music;
+mod remove;
 
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
-    /// Target store to operate on
-    #[arg(short, long, value_name = "STORE")]
-    target: Option<String>,
-
     #[command(subcommand)]
     command: Option<Subcommands>,
 }
@@ -16,13 +17,9 @@ struct Cli {
 enum Subcommands {
     /// Push a song (or all the songs in a directory) to the store.
     Push {
+        path: PathBuf,
         #[arg(short, long)]
-        list: bool,
-    },
-    /// Check the status of a store
-    Check {
-        #[arg(short, long)]
-        list: bool,
+        recursive: bool,
     },
     /// Initialize a new store
     Init {
@@ -31,49 +28,18 @@ enum Subcommands {
         #[arg(short, long)]
         force: bool,
     },
+    Remove {
+        id: String,
+    },
 }
 
 fn main() {
     let cli: Cli = Cli::parse();
 
     match &cli.command {
-        Some(Subcommands::Init { force }) => init(force),
-        Some(_) => {
-            println!("Not printing testing lists...");
-        }
-        None => {}
+        Some(Subcommands::Init { force }) => init::init(force),
+        Some(Subcommands::Push { path, recursive }) => add::add(path, recursive),
+        Some(Subcommands::Remove { id }) => println!("Work in progress..."),
+        None => println!("No command provided."),
     }
-}
-
-fn init(force: &bool) {
-    let sailer_dir = Path::new(".sailer");
-    println!("{}", sailer_dir.display());
-    let existing = sailer_dir.exists();
-    if existing {
-        if *force {
-            println!(
-                "Force initialization.
-Existing .sailer will be deleted.
-Continue? (y/n)"
-            );
-            let mut input = String::new();
-            std::io::stdin().read_line(&mut input).unwrap();
-            if input.trim() != "y" {
-                println!("Aborted.");
-                return;
-            } else {
-                println!("Deleting existing .sailer directory...");
-                fs::remove_dir_all(sailer_dir).unwrap();
-            }
-        } else {
-            println!(".sailer directory exists.\nSkip initialization.");
-            return;
-        }
-    } else {
-        println!(".sailer directory does not exist.");
-    }
-    println!("Creating .sailer directory...");
-    fs::create_dir(sailer_dir).unwrap();
-    println!("Initialization complete.");
-    return;
 }
