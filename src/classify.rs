@@ -45,22 +45,29 @@ pub fn classify(by: &str, list: &bool) {
         // former code copied from src/list.rs, next code are new
         match by {
             "all" => {
-                symlink_to_dir("./all", &music.to_string_no_id(), music.get_id());
+                symlink_to_dir(
+                    "../.sailer/store",
+                    "./all",
+                    &format!("{}.mp3", music.to_string_no_id()),
+                    music.get_id(),
+                );
             }
             "artist" => {
                 let artists = divide_by_symbols(music.get_artist());
                 for artist in artists {
                     symlink_to_dir(
+                        "../../.sailer/store",
                         &format!("./artist/{}", artist),
-                        &music.to_string_no_id(),
+                        &format!("{}.mp3", music.to_string_no_id()),
                         music.get_id(),
                     );
                 }
             }
             "album" => {
                 symlink_to_dir(
+                    "../../.sailer/store",
                     &format!("./album/{}", music.get_album()),
-                    &music.to_string_no_id(),
+                    &format!("{}.mp3", music.to_string_no_id()),
                     music.get_id(),
                 );
             }
@@ -84,11 +91,11 @@ fn divide_by_symbols(s: &str) -> Vec<String> {
     result
 }
 
-fn symlink_to_dir(to_dir: &str, sym_link_name: &str, id: &str) {
-    let song_path = format!(".sailer/store/{}", id);
+fn symlink_to_dir(from_dir: &str, to_dir: &str, sym_link_name: &str, id: &str) {
+    let from_path = format!("{}/{}", from_dir, id);
 
     create_dir(&to_dir);
 
     let link_path = format!("{}/{}", to_dir, sym_link_name);
-    symlink(&song_path, &link_path).unwrap();
+    symlink(&from_path, &link_path).unwrap();
 }
