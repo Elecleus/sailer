@@ -25,16 +25,16 @@ impl Music<'_> {
         self.id
     }
     #[allow(dead_code)]
-    pub fn get_title(&self) -> Option<&str> {
-        self.title
+    pub fn get_title(&self) -> &str {
+        self.title.unwrap_or("Unknown")
     }
     #[allow(dead_code)]
-    pub fn get_artist(&self) -> Option<&str> {
-        self.artist
+    pub fn get_artist(&self) -> &str {
+        self.artist.unwrap_or("Unknown")
     }
     #[allow(dead_code)]
-    pub fn get_album(&self) -> Option<&str> {
-        self.album
+    pub fn get_album(&self) -> &str {
+        self.album.unwrap_or("Unknown")
     }
     // pub fn set_title(&mut self, title: Option<&str>) {
     //     self.title = title;
@@ -47,11 +47,18 @@ impl Music<'_> {
     // }
     pub fn to_string(&self) -> String {
         format!(
-            "{}: {} by {} ({})",
+            "{}: {} - {} ({})",
             self.id,
-            self.title.unwrap_or("Unknown"),
             self.artist.unwrap_or("Unknown"),
+            self.title.unwrap_or("Unknown"),
             self.album.unwrap_or("Unknown")
+        )
+    }
+    pub fn to_string_no_id(&self) -> String {
+        format!(
+            "{} - {}",
+            self.artist.unwrap_or("Unknown"),
+            self.title.unwrap_or("Unknown")
         )
     }
 }

@@ -6,6 +6,8 @@ mod init;
 mod list;
 mod music;
 mod remove;
+mod classify;
+mod utils;
 
 #[derive(Parser)]
 #[command(version)]
@@ -33,6 +35,14 @@ enum Commands {
     Remove(Remove),
     /// List all the songs in the store.
     List,
+    Classify{
+        /// Classify the songs in the store by
+        #[arg(short, long)]
+        by: String,
+        /// List all aviailable classify-by options
+        #[arg(short, long)]
+        list: bool,
+    },
 }
 
 #[derive(Args)]
@@ -50,6 +60,7 @@ fn main() {
         Some(Commands::Add { path, recursive }) => add::add(path, recursive),
         Some(Commands::Remove(args)) => remove::remove(&args.id),
         Some(Commands::List) => list::list(),
+        Some(Commands::Classify { by , list}) => classify::classify(by, list),
         None => println!("No command provided."),
     }
 }
